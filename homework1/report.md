@@ -86,6 +86,7 @@ void quickSort(std::vector<int>& arr, int low, int high) {
 ```
 
 ### Merge sort (合併排序法)
+通過把資料切割到只剩單獨資料一組之後開始兩兩合併並排序
 
 ```c++
 template <class T>
@@ -129,10 +130,8 @@ void MergeSort(std::vector<T>& a, const int n) {
 	}
 }
 ```
-Merge Sort的說明
-
-通過把資料切割到只剩單獨資料一組之後開始兩兩合併並排序
 ### Heap sort (堆積排序法)
+通過製造最大堆積樹後，把最大值與最後一個節點交換，並一直重複此過程來實現排序
 
 ```c++
 void heapify(std::vector<int>& arr, int arraySize, int i) {
@@ -180,9 +179,7 @@ void heapSort(std::vector<int>& arr) {
     }
 }
 ```
-Heap sort的說明
 
-通過製造最大堆積樹後，把最大值與最後一個節點交換，並一直重複此過程來實現排序
 ### Composite Sort
 #### Composite Sort 程式邏輯
 ```
