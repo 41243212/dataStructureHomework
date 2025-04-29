@@ -69,7 +69,9 @@ void quickSort(std::vector<int>& arr, int low, int high) {
     }
 }
 ```
+quicksort的說明
 
+通過選取pivot來做依據，比pivot小的放左邊，比它大的放右邊，同時繼續quicksort被分成兩串的排序直到完成。
 ## 效能分析
 
 ## 測試與驗證
