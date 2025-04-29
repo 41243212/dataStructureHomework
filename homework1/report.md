@@ -275,6 +275,24 @@ int generateWorst() {
 	}
 }
 ```
+
+### Average-case 測資生成
+使用以下函式生成內含隨機數字的 vector。在計算耗時時，使用以下函式隨機生成 1000 次測資，取每次測試的平均結果。
+```c++
+std::vector<int> generateRandomArray(int n) {
+    std::vector<int> arr;
+    arr.reserve(n);
+
+    std::mt19937 rng(static_cast<unsigned int>(std::time(nullptr)));
+    std::uniform_int_distribution<int> dist(0, n * 2);
+
+    for (int i = 0; i < n; ++i) {
+        arr.push_back(dist(rng));
+    }
+    return arr;
+}
+```
+
 ## 效能分析
 
 ### 時間複雜度
@@ -292,7 +310,10 @@ int generateWorst() {
 | Insertion sort (插入排序法) | $$O(1)$$ |
 | Quick sort (快速排序法) | $$O(\log n) \sim O(n)$$ |
 | Merge sort (合併排序法) | $$O(n)$$ |
-| Heap sort (堆積排序法) | $$O(1)$$ |
+| Heap sort (堆積排序法) | $$O(\log n)$$ |
+
+> [!NOTE]
+> Heap sort 使用 Recursion 版本，若為 Iterative 版本則為 $O(1)$ 。
 
 ## 測試與驗證
 
@@ -328,6 +349,7 @@ int generateWorst() {
 | $n = 4000$   | 12                          | 14124                   | 16004                   | 152                    |
 | $n = 5000$   | 12                          | 17884                   | 20004                   | 164                    |
 
+![Worst-case Memory Usage (bytes)](https://i.imgup.co/zPy0j.png)
 
 ### 結論
 
