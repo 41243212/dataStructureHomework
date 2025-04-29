@@ -3,13 +3,8 @@
 #include <chrono>
 #include <random>
 #include <cmath>
-
 #include <fstream>
 #include <string>
-
-#include <Windows.h>
-#include <Psapi.h>
-#include <stdbool.h>
 
 std::vector<int> generateRandomArray(int n) {
     std::vector<int> arr;
