@@ -11,19 +11,6 @@
 #include <Psapi.h>
 #include <stdbool.h>
 
-void printMemoryUsage(bool print = true) {
-	PROCESS_MEMORY_COUNTERS memInfo;
-	GetProcessMemoryInfo(GetCurrentProcess(), &memInfo, sizeof(memInfo));
-	if (print) {
-		std::cout << "----------------------------------------------------------" << std::endl;
-		std::cout << "Memory Usage Information:" << std::endl;
-		std::cout << "Working Set Size: " << memInfo.WorkingSetSize / 1024 << " KB" << std::endl;
-		std::cout << "Peak Working Set Size: " << memInfo.PeakWorkingSetSize / 1024 << " KB" << std::endl;
-		std::cout << "Pagefile Usage: " << memInfo.PagefileUsage / 1024 << " KB" << std::endl;
-		std::cout << "----------------------------------------------------------" << std::endl;
-	}
-}
-
 std::vector<int> generateRandomArray(int n) {
     std::vector<int> arr;
     arr.reserve(n);
@@ -38,6 +25,8 @@ std::vector<int> generateRandomArray(int n) {
 
     return arr;
 }
+
+size_t totalMemoryUsed = 0;
 
 template <class T>
 void Merge(std::vector<T>& initList, std::vector<T>& mergedList, const int left, const int mid, const int n) {
@@ -73,6 +62,7 @@ void MergePass(std::vector<T>& initList, std::vector<T>& resultList, const int n
 template <class T>
 void MergeSort(std::vector<T>& a, const int n) {
 	std::vector<T> temp(n + 1);
+	totalMemoryUsed += (n + 1) * sizeof(T);
 	for (int l = 1; l < n; l *= 2) {
 		MergePass(a, temp, n, l);
 		l *= 2;
@@ -90,7 +80,7 @@ int generateWorst() {
 	double maxAvgTime = 0;
 	std::vector<int> slowestInput;
 	std::vector<int> slowestOutput;
-	printMemoryUsage(false);
+	size_t maxTotalMemoryUsed = 0;
 	for (int k = 0; k < 6; k++) {
 		n = sizes[k];
 		for (int i = 0; i < tries; ++i) {
@@ -101,7 +91,7 @@ int generateWorst() {
 			// Run multiple trials on the same input to average the time
 			for (int j = 0; j < reruns; ++j) {
 				copy = input;
-
+				totalMemoryUsed = 0;
 				// Measure the execution time using chrono
 				auto start = std::chrono::high_resolution_clock::now();
 				MergeSort(copy, n);
@@ -120,11 +110,12 @@ int generateWorst() {
 				maxAvgTime = avgTime;
 				slowestInput = input;
 				slowestOutput = copy;
+				maxTotalMemoryUsed = totalMemoryUsed;
 			}
 		}
 
-		std::cout << "n=" << n << "\nAverage execution time : " << maxAvgTime << " ms\n";
-		printMemoryUsage(true);
+		std::cout << "n=" << n << "\nWorst execution time : " << maxAvgTime << " ms\n";
+		std::cout << "Estimated total memory used: " << maxTotalMemoryUsed << " bytes\n";
 		// Writing input of the slowest input to file
 		std::string filename = "mergeSort_n" + std::to_string(n) + "_in.txt";
 		std::ofstream outputFile(filename);
@@ -155,8 +146,28 @@ int generateWorst() {
 	}
 }
 
+void avgCase() {
+	int sizes[] = { 500, 1000, 2000, 3000, 4000, 5000 };
+	for (int i = 0; i < 6; i++) {
+		int tries = 1000;
+		int size = sizes[i];
+		std::cout << "n = " << size << std::endl;
+		std::chrono::duration<double> elapsed = std::chrono::duration<double>::zero();
+		for (int j = 0; j < tries; j++) {
+			std::vector<int> result = generateRandomArray(size);
+			auto start = std::chrono::high_resolution_clock::now();
+			MergeSort(result, size);
+			auto end = std::chrono::high_resolution_clock::now();
+			elapsed += end - start;
+		}
+		elapsed /= tries;
+		std::cout << "Avg execution time: " << elapsed.count() * 1000 << " milliseconds\n";
+	}
+}
+
 int main() {
-	printMemoryUsage(true);
 	generateWorst();
+	std::cout << "Average case\n";
+	avgCase();
 	return 0;
 }

@@ -56,6 +56,19 @@ std::vector<int> generateQuickSortWorst(int n) {
     return arr;
 }
 
+std::vector<int> generateRandomArray(int n) {
+    std::vector<int> arr;
+    arr.reserve(n);
+
+    std::mt19937 rng(static_cast<unsigned int>(std::time(nullptr)));
+    std::uniform_int_distribution<int> dist(0, n * 2);
+
+    for (int i = 0; i < n; ++i) {
+        arr.push_back(dist(rng));
+    }
+    return arr;
+}
+
 // Partition function
 int partition(std::vector<int>& arr, int low, int high) {
     addStackFrame(sizeOfPartitionFrame);
@@ -99,5 +112,22 @@ int main() {
 		std::cout << "Execution time: " << elapsed.count() * 1000 << " milliseconds\n";
         std::cout << "Peak Stack Memory Usage During Sorting: " << peakStackBytes << " bytes\n";
 	}
+
+    std::cout << "Average case\n";
+    for (int i = 0; i < 6; i++) {
+        int tries = 1000;
+        int size = sizes[i];
+        std::cout << "n = " << size << std::endl;
+        std::chrono::duration<double> elapsed = std::chrono::duration<double>::zero();
+        for (int j = 0; j < tries; j++) {
+            std::vector<int> result = generateRandomArray(size);
+            auto start = std::chrono::high_resolution_clock::now();
+            quickSort(result, 0, size - 1);
+            auto end = std::chrono::high_resolution_clock::now();
+            elapsed += end - start;
+        }
+        elapsed /= tries;
+        std::cout << "Avg execution time: " << elapsed.count() * 1000 << " milliseconds\n";
+    }
     return 0;
 }
