@@ -1,3 +1,4 @@
+
 # 41243212
 # 41243223
 
@@ -21,6 +22,9 @@
 ## 程式實作
 
 ### Insertion sort (插入排序法)
+
+把資料分成兩串，一串為排好的，另一串沒有排好，然後開始選取另一串沒排好的數字插入排好的排序中，如果比它大就把排好的排序往右推一格。
+
 ```c++
 void insertionSort(std::vector<int>& arr, int size)
 {
@@ -38,9 +42,11 @@ void insertionSort(std::vector<int>& arr, int size)
 }
 ```
 
-把資料分成兩串，一串為排好的，另一串沒有排好，然後開始選取另一串沒排好的數字插入排好的排序中，如果比它大就把排好的排序往右推一格。
 
 ### Quick sort (快速排序法)
+
+通過medianOfThree策略來選取pivot做為依據，比pivot小的放左邊，比它大的放右邊，同時繼續quicksort被分成兩串的排序直到完成。
+
 ```c++
 // Function to find the median of three elements and use it as pivot
 int medianOfThree(std::vector<int>& arr, int low, int high) {
@@ -79,9 +85,8 @@ void quickSort(std::vector<int>& arr, int low, int high) {
 }
 ```
 
-通過medianOfThree策略來選取pivot做為依據，比pivot小的放左邊，比它大的放右邊，同時繼續quicksort被分成兩串的排序直到完成。
-
 ### Merge sort (合併排序法)
+
 ```
 template <class T>
 void Merge(std::vector<T>& initList, std::vector<T>& mergedList, const int left, const int mid, const int n) {
@@ -126,6 +131,7 @@ void MergeSort(std::vector<T>& a, const int n) {
 ```
 
 ### Heap sort (堆積排序法)
+
 ```
 void heapify(std::vector<int>& arr, int arraySize, int i) {
 	totalMemoryUsed += 3 * sizeof(int);
@@ -173,6 +179,102 @@ void heapSort(std::vector<int>& arr) {
 }
 ```
 
+### 耗時計算
+
+使用 chrono 函式庫來計算呼叫排序算法的耗時。為了避免誤差，實作時會運行5次相同排序，並取平均耗時作為結果。
+```
+auto start = std::chrono::high_resolution_clock::now();
+Sort(input);
+auto end = std::chrono::high_resolution_clock::now();
+std::chrono::duration<double> elapsed = end - start;
+time = elapsed.count() * 1000.0; // Convert to milliseconds
+```
+
+### Worst-case 測資生成
+
+#### Insertion sort (插入排序法)
+生成 [n, n-1, n-2, ... , 1] 的輸入
+```
+std::vector<int> generateInsertionSortWorst(int n) {
+	std::vector<int> arr(n);
+	for (std::vector<int>::iterator it = arr.begin(); it != arr.end(); it++)
+	{
+		*it = n - (it - arr.begin());
+	}
+	return arr;
+}
+```
+
+#### Quick sort (快速排序法)
+在 Quick Sort 中選擇 pivot 時，Median of Three 策略會取：
+`pivot = median(arr[start], arr[mid], arr[end])`
+createBadInput這個遞迴函式，它將設計過的數字填入陣列，使 Quick Sort 中的 Median of Three 每次都選到最糟的 pivot，因次時間複雜度會退化為 $O(n^2)$。
+```
+void createBadInput(std::vector<int>& arr, int start, int end, int& current) {
+    if (start > end) return;
+
+    int mid = (start + end) / 2;
+    arr[mid] = current++;
+
+    // Recursively fill left and right to maintain bad pivot conditions
+    createBadInput(arr, start, mid - 1, current);
+    createBadInput(arr, mid + 1, end, current);
+}
+
+std::vector<int> generateQuickSortWorst(int n) {
+    std::vector<int> arr(n);
+    int current = 1;
+    createBadInput(arr, 0, n - 1, current);
+    return arr;
+}
+```
+#### Merge sort (合併排序法) 及 Heap sort (堆積排序法)
+因為這兩個排序法的平均及最差情況皆為$O(n \log n)$，在測試耗費時間時，使用的測資是使用1000次生成中耗時最久的測資最為結果。
+```
+int generateWorst() {
+	int sizes[] = { 500, 1000, 2000, 3000, 4000, 5000 };
+	int n; // Size of the array
+	int tries = 1000; // 重複生成次數
+	int reruns = 5; // 執行5次取平均 確保耗時準確性
+
+	double maxAvgTime = 0;
+	std::vector<int> slowestInput;
+	std::vector<int> slowestOutput;
+	for (int k = 0; k < 6; k++) {
+		n = sizes[k];
+		// 執行1000次生成及排序，紀錄耗時最久的測資
+		for (int i = 0; i < tries; ++i) {
+			std::vector<int> input = generateRandomArray(n);
+			std::vector<int> copy;
+			double totalTime = 0.0;
+
+			for (int j = 0; j < reruns; ++j) {
+				copy = input;
+				// Measure the execution time using chrono
+				auto start = std::chrono::high_resolution_clock::now();
+				heapSort(copy);
+				auto end = std::chrono::high_resolution_clock::now();
+
+				// Calculate the elapsed time in milliseconds and accumulate
+				std::chrono::duration<double> elapsed = end - start;
+				totalTime += elapsed.count() * 1000.0; // Convert to milliseconds
+			}
+
+			// Average time for this input
+			double avgTime = totalTime / reruns;
+
+			// Track the slowest input based on average time
+			if (avgTime > maxAvgTime) {
+				maxAvgTime = avgTime;
+				slowestInput = input;
+				slowestOutput = copy;
+			}
+		}
+
+		std::cout << "n=" << n << "\nWorst execution time : " << maxAvgTime << " ms\n";
+	}
+}
+```
 ## 效能分析
 
 ### 時間複雜度
@@ -194,8 +296,6 @@ void heapSort(std::vector<int>& arr) {
 
 ## 測試與驗證
 
-### 測試案例
-
 ####  Worst-case 耗費時間(milliseconds)
 | 資料筆數 $n$ | Insertion sort (插入排序法) | Quick sort (快速排序法) | Merge sort (合併排序法) | Heap sort (堆積排序法) |
 |--------------|-----------------------------|-------------------------|-------------------------|------------------------|
@@ -205,6 +305,7 @@ void heapSort(std::vector<int>& arr) {
 | $n = 3000$   | 1.0059                      | 0.3524                  | 0.156                   | 0.2035                 |
 | $n = 4000$   | 1.835                       | 0.5912                  | 0.21262                 | 0.25766                |
 | $n = 5000$   | 2.76                        | 1.0207                  | 0.28352                 | 0.31126                |
+
 ![Worst-case Running Time vs Input Size](https://i.imgup.co/zPi1c.png)
 #### Average-case 耗費時間(milliseconds)
 | 資料筆數 $n$ | Insertion sort (插入排序法) | Quick sort (快速排序法) | Merge sort (合併排序法) | Heap sort (堆積排序法) |
@@ -215,6 +316,7 @@ void heapSort(std::vector<int>& arr) {
 | $n = 3000$   | 0.749515                    | 0.0824432               | 0.109856                | 0.135663               |
 | $n = 4000$   | 1.27272                     | 0.126867                | 0.163584                | 0.207448               |
 | $n = 5000$   | 1.84374                     | 0.169902                | 0.217879                | 0.254465               |
+
 ![Average-case Running Time vs Input Size](https://i.imgup.co/zPPdS.png)
 #### Worst-case 記憶體使用量(bytes)
 | 資料筆數 $n$ | Insertion sort (插入排序法) | Quick sort (快速排序法) | Merge sort (合併排序法) | Heap sort (堆積排序法) |
