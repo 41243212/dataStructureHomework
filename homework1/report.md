@@ -179,6 +179,31 @@ void heapSort(std::vector<int>& arr) {
 }
 ```
 
+### Composite Sort
+#### Composite Sort 程式邏輯
+```
+compositeSort(arr):
+  ├── if arr.size() <= 16:
+  │     └── insertionSort
+  ├── else if alreadyNearlySorted(arr):
+  │     └── mergeSort
+  └── else:
+        └── quickSort(arr, depthLimit = 2 * log2(n))
+                ├── if depthLimit == 0:
+                │     └── heapSort
+                └── if small segment:
+                      └── insertionSort
+
+```
+#### 整體策略邏輯
+
+| 資料特性 | 採用演算法 | 原因 |
+|----------|-------------|------|
+| 資料量小（≤16） | Insertion Sort | 開銷極低，快且穩定 |
+| 幾乎已排序 (>95%) | Merge Sort | 穩定、預測性高，對近乎排序資料表現佳 |
+| 資料量大、亂序 | Quick Sort | 分治法效能佳，平均時間複雜度 $O(n\log n)$ |
+| Quick Sort 遞迴太深（退化） | Heap Sort | 最壞情況保證 $O(n\log n)$，避免 quick sort 退化為 $O(n^2)$ |
+
 ### 耗時計算
 
 使用 chrono 函式庫來計算呼叫排序算法的耗時。為了避免誤差，實作時會運行5次相同排序，並取平均耗時作為結果。
@@ -229,7 +254,7 @@ std::vector<int> generateQuickSortWorst(int n) {
 }
 ```
 #### Merge sort (合併排序法) 及 Heap sort (堆積排序法)
-因為這兩個排序法的平均及最差情況皆為$O(n \log n)$，在測試耗費時間時，使用的測資是使用1000次生成中耗時最久的測資最為結果。
+因為這兩個排序法的平均及最差情況皆為$O(n \log n)$，在測試耗費時間時，使用的測資是使用1000次生成中耗時最久的測資做為結果。
 ```c++
 int generateWorst() {
 	int sizes[] = { 500, 1000, 2000, 3000, 4000, 5000 };
@@ -350,6 +375,17 @@ std::vector<int> generateRandomArray(int n) {
 | $n = 5000$   | 12                          | 17884                   | 20004                   | 164                    |
 
 ![Worst-case Memory Usage (bytes)](https://i.imgup.co/zPy0j.png)
+#### Composite Sort 與 std::sort 耗費時間(milliseconds)
+| 資料筆數 $n$ | Composite Sort | std::sort |
+|--------------|----------------|-----------|
+| $n = 500$    | 0.0028872      | 0.0044746 |
+| $n = 1000$   | 0.0061         | 0.0089749 |
+| $n = 2000$   | 0.0135987      | 0.0246504 |
+| $n = 3000$   | 0.021979       | 0.0738061 |
+| $n = 4000$   | 0.0786211      | 0.10292   |
+| $n = 5000$   | 0.127512       | 0.144991  |
+| $n = 10000$  | 0.325728       | 0.353554  |
+| $n = 100000$ | 4.33169        | 4.64411   |
 
 ### 結論
 
