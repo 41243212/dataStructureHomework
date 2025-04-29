@@ -87,7 +87,7 @@ void quickSort(std::vector<int>& arr, int low, int high) {
 
 ### Merge sort (合併排序法)
 
-```
+```c++
 template <class T>
 void Merge(std::vector<T>& initList, std::vector<T>& mergedList, const int left, const int mid, const int n) {
 	int i1 = left, i2 = mid + 1, iResult = left;
@@ -132,7 +132,7 @@ void MergeSort(std::vector<T>& a, const int n) {
 
 ### Heap sort (堆積排序法)
 
-```
+```c++
 void heapify(std::vector<int>& arr, int arraySize, int i) {
 	totalMemoryUsed += 3 * sizeof(int);
 	heapifyCallDepth++;
@@ -182,7 +182,7 @@ void heapSort(std::vector<int>& arr) {
 ### 耗時計算
 
 使用 chrono 函式庫來計算呼叫排序算法的耗時。為了避免誤差，實作時會運行5次相同排序，並取平均耗時作為結果。
-```
+```c++
 auto start = std::chrono::high_resolution_clock::now();
 Sort(input);
 auto end = std::chrono::high_resolution_clock::now();
@@ -194,7 +194,7 @@ time = elapsed.count() * 1000.0; // Convert to milliseconds
 
 #### Insertion sort (插入排序法)
 生成 [n, n-1, n-2, ... , 1] 的輸入
-```
+```c++
 std::vector<int> generateInsertionSortWorst(int n) {
 	std::vector<int> arr(n);
 	for (std::vector<int>::iterator it = arr.begin(); it != arr.end(); it++)
@@ -209,7 +209,7 @@ std::vector<int> generateInsertionSortWorst(int n) {
 在 Quick Sort 中選擇 pivot 時，Median of Three 策略會取：
 `pivot = median(arr[start], arr[mid], arr[end])`
 createBadInput這個遞迴函式，它將設計過的數字填入陣列，使 Quick Sort 中的 Median of Three 每次都選到最糟的 pivot，因次時間複雜度會退化為 $O(n^2)$。
-```
+```c++
 void createBadInput(std::vector<int>& arr, int start, int end, int& current) {
     if (start > end) return;
 
@@ -230,7 +230,7 @@ std::vector<int> generateQuickSortWorst(int n) {
 ```
 #### Merge sort (合併排序法) 及 Heap sort (堆積排序法)
 因為這兩個排序法的平均及最差情況皆為$O(n \log n)$，在測試耗費時間時，使用的測資是使用1000次生成中耗時最久的測資最為結果。
-```
+```c++
 int generateWorst() {
 	int sizes[] = { 500, 1000, 2000, 3000, 4000, 5000 };
 	int n; // Size of the array
@@ -321,12 +321,12 @@ int generateWorst() {
 #### Worst-case 記憶體使用量(bytes)
 | 資料筆數 $n$ | Insertion sort (插入排序法) | Quick sort (快速排序法) | Merge sort (合併排序法) | Heap sort (堆積排序法) |
 |--------------|-----------------------------|-------------------------|-------------------------|------------------------|
-| $n = 500$    | 12                          | 2044                    | 2004                    | 53788                  |
-| $n = 1000$   | 12                          | 3984                    | 4004                    | 119016                 |
-| $n = 2000$   | 12                          | 7544                    | 8004                    | 261616                 |
-| $n = 3000$   | 12                          | 11324                   | 12004                   | 414404                 |
-| $n = 4000$   | 12                          | 14124                   | 16004                   | 571416                 |
-| $n = 5000$   | 12                          | 17884                   | 20004                   | 735388                 |
+| $n = 500$    | 12                          | 2044                    | 2004                    | 116                    |
+| $n = 1000$   | 12                          | 3984                    | 4004                    | 128                    |
+| $n = 2000$   | 12                          | 7544                    | 8004                    | 140                    |
+| $n = 3000$   | 12                          | 11324                   | 12004                   | 152                    |
+| $n = 4000$   | 12                          | 14124                   | 16004                   | 152                    |
+| $n = 5000$   | 12                          | 17884                   | 20004                   | 164                    |
 
 
 ### 結論
