@@ -28,6 +28,9 @@ void insertionSort(std::vector<int>& arr, int size)
     }
 }
 ```
+instertion sort的說明
+
+把資料分成兩串，一串為排好的，另一串沒有排好，然後開始選取另一串沒排好的數字插入排好的排序中，如果比它大就把排好的排序往右推一格
 ### Quick Sort (快速排序法)
 ```c++
 // Function to find the median of three elements and use it as pivot
