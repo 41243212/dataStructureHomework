@@ -23,7 +23,7 @@
 
 ### Insertion sort (插入排序法)
 
-把資料分成兩串，一串為排好的，另一串沒有排好，然後開始選取另一串沒排好的數字插入排好的排序中，如果比它大就把排好的排序往右推一格。
+把資料分成左右兩部分，左邊的為排好的，右邊的則尚未排好，然後取出右邊還沒排好的第一個數字，如果在已經排序好的部分中有比它大的，就把排好的排序往右移一格，直到沒有比它大的，最後插入在空出來的位置。
 
 ```c++
 void insertionSort(std::vector<int>& arr, int size)
@@ -45,7 +45,7 @@ void insertionSort(std::vector<int>& arr, int size)
 
 ### Quick sort (快速排序法)
 
-通過medianOfThree策略來選取pivot做為依據，比pivot小的放左邊，比它大的放右邊，同時繼續quicksort被分成兩串的排序直到完成。
+通過 `medianOfThree` 函式來選取 pivot 做為依據，比 pivot 小的放左邊，比它大的放右邊，同時繼續執行 `quickSort` 將分成兩邊的資料遞迴排序直到完成排序。
 
 ```c++
 // Function to find the median of three elements and use it as pivot
@@ -86,7 +86,9 @@ void quickSort(std::vector<int>& arr, int low, int high) {
 ```
 
 ### Merge sort (合併排序法)
-通過把資料切割到只剩單獨資料一組之後開始兩兩合併並排序
+首先透過迭代方式將輸入陣列分割為大小越來越小的子陣列，直到每個子陣列只包含單一元素（視為已排序）。
+隨後，透過 `Merge` 函式將這些子陣列兩兩合併，確保合併後的子陣列保持排序狀態。此合併過程由 `MergePass` 函式控制，負責將陣列分成大小為 `s` 的子陣列對並呼叫 `Merge` 進行合併。
+整個排序流程由 `MergeSort` 函式統籌，通過迭代地增加子陣列大小（從 1 開始，每次倍增），反覆執行 `MergePass`，並在原始陣列和臨時陣列間交換結果，最終完成整個陣列的排序。
 
 ```c++
 template <class T>
@@ -131,7 +133,8 @@ void MergeSort(std::vector<T>& a, const int n) {
 }
 ```
 ### Heap sort (堆積排序法)
-通過製造最大堆積樹後，把最大值與最後一個節點交換，並一直重複此過程來實現排序
+先透過 `buildMaxHeap` 函式將陣列建成最大堆積，內部使用 `heapify` 確保父節點大於子節點。
+然後，`heapSort` 反覆將堆頂端的最大值與最後節點交換，縮減堆積大小，並呼叫 `heapify` 恢復堆積性質，直到陣列完全排序。
 
 ```c++
 void heapify(std::vector<int>& arr, int arraySize, int i) {
@@ -233,7 +236,9 @@ std::vector<int> generateInsertionSortWorst(int n) {
 
 #### Quick sort (快速排序法)
 在 Quick Sort 中選擇 pivot 時，Median of Three 策略會取：
+
 `pivot = median(arr[start], arr[mid], arr[end])`
+
 createBadInput這個遞迴函式，它將設計過的數字填入陣列，使 Quick Sort 中的 Median of Three 每次都選到最糟的 pivot，因次時間複雜度會退化為 $O(n^2)$。
 ```c++
 void createBadInput(std::vector<int>& arr, int start, int end, int& current) {
@@ -376,7 +381,7 @@ std::vector<int> generateRandomArray(int n) {
 | $n = 5000$   | 12                          | 17884                   | 20004                   | 164                    |
 
 ![Worst-case Memory Usage (bytes)](https://i.imgup.co/zPy0j.png)
-#### Composite Sort 與 std::sort 耗費時間(milliseconds)
+#### Composite Sort 與 std::sort 耗費時間(milliseconds)比較
 | 資料筆數 $n$ | Composite Sort | std::sort |
 |--------------|----------------|-----------|
 | $n = 500$    | 0.0028872      | 0.0044746 |
@@ -390,7 +395,22 @@ std::vector<int> generateRandomArray(int n) {
 
 ### 結論
 
+1. **時間複雜度與實際表現一致**：
+   - **Insertion Sort**：在最壞情況下呈現 \(O(n^2)\) 的平方增長，耗時隨輸入規模快速增加（例如 n=5000 時達 2.76ms）。在平均情況下表現稍佳，但不適合大量數據。
+   - **Quick Sort**：得益於 median-of-three 策略，有效的避免算法退化到 \(O(n^2)\)，最壞情況耗時優於 Insertion Sort（n=5000 時為 1.0207ms），平均情況下表現最佳，驗證其 \(O(n \log n)\) 的高效性。
+   - **Merge Sort**：無論最壞或平均情況均穩定維持 \(O(n \log n)\)，耗時增長平穩（n=5000 時最壞為 0.28352ms，平均為 0.217879ms），適合需要穩定性的場景。
+   - **Heap Sort**：同樣保持 \(O(n \log n)\) 的穩定表現，耗時略高於 Merge Sort（n=5000 時最壞為 0.31126ms，平均為 0.254465ms），但記憶體使用量低。
+   - **Composite Sort**：結合多種排序法的優勢，根據資料特性動態選擇演算法，在所有測試下均優於 std::sort。設計有效避免單一演算法的弱點，特別是在小數據量（使用 Insertion Sort）、近乎排序數據（使用 Merge Sort）及遞迴退化（切換至 Heap Sort）等情況。
 
+2. **空間複雜度與記憶體使用**：
+   - **Insertion Sort** 原地排序，記憶體使用量極低。
+   - **Quick Sort** 因遞迴深度導致記憶體使用量隨輸入規模增長（n=5000 時達 17884 bytes），在最壞情況下表現不佳。
+   - **Merge Sort** 需要額外 \(O(n)\) 空間，記憶體使用量較高（n=5000 時為 20004 bytes），不適合對記憶體敏感的場景。
+   - **Heap Sort** 空間需求低（n=5000 時為 164 bytes），僅需少量遞迴空間，效率高於 Quick Sort 和 Merge Sort。
+   - **Composite Sort** 因動態選擇演算法，記憶體使用量取決於採取的策略，但整體保持合理範圍，平衡了時間與空間需求。
 
 ## 申論及開發報告
 
+這份報告驗證了各排序演算法在理論與實務上的表現差異，除了 Quick Sort 因 median-of-three 策略有效的避免了出現 \(O(n^2)\) 的情況，其他排序算法的結果皆高度符合理論值。
+
+Composite Sort 展示了因應資料來選擇採用的排序方式，能夠有效應對多樣化的測資特性，最終證明效率優於 std::sort。
