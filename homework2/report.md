@@ -11,7 +11,7 @@
 - Max/Min Heap
   - 使用 MinPQ 的 ADT 實現 MinHeap Class
   - 複雜度與原本的 MaxHeap 相同
--  Binary Search Tree
+- Binary Search Tree
   - 實現二元搜尋樹
   - 使用均匀分布隨機產生 n 個結果，插入二元搜尋樹中
   - 測試 n = 100, 500, 1000, 2000, 3000, ..., 10000 產生出來的樹的高度
